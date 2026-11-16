@@ -1,0 +1,20 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Frame name="ShoutcasterChannelHeaderTemplate" inherits="SettingsListElementTemplate" mixin="ShoutcasterChannelHeaderMixin" virtual="true">
+        <Size x="280" y="26"/>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+        </Scripts>
+    </Frame>
+    <Frame name="ShoutcasterGroupHeaderTemplate" inherits="SettingsListElementTemplate" mixin="ShoutcasterGroupHeaderMixin" virtual="true">
+        <Size x="280" y="28"/>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+        </Scripts>
+    </Frame>
+    <Frame name="ShoutcasterChannelRowTemplate" inherits="SettingsListElementTemplate" mixin="ShoutcasterChannelRowMixin" virtual="true">
+        <Size x="280" y="26"/>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+        </Scripts>
+    </Frame>
+</Ui>

@@ -1,0 +1,14 @@
+## Interface: 16001
+## Title: Shoutcaster
+## Notes: Tank and interrupt announcements and a Battle Shout reminder for warriors.
+## IconTexture: Interface\Icons\Ability_Warrior_BattleShout
+## Author: towneh
+## Version: 0.1.0
+## SavedVariables: ShoutcasterDB
+## SavedVariablesPerCharacter: ShoutcasterCharDB
+
+Core.lua
+Alerts.lua
+Reminders.lua
+Options.lua
+Options.xml
