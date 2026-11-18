@@ -42,7 +42,10 @@ lands counts as your interrupt. The game hides which spell was interrupted,
 and the message names only the enemy. A Shield Bash or Pummel on an enemy that
 isn't casting stays quiet.
 
-**Test alert** on the main options page shows a sample on your screen.
+Announcements shown on screen play a short chime. You can swap it for Bell,
+Pluck, Bubble, Marimba or nothing under **On-screen alert sound** on the main
+options page, and you'll hear each one as you pick it. **Test alert**
+shows a sample on your screen.
 
 ### Where announcements go
 
@@ -64,7 +67,7 @@ Each page is a grid with a row for each message, grouped into **Taunts**,
 | **Say** | /say, inside instances only, as the game blocks automated /say elsewhere |
 | **Yell** | /yell, inside instances only, for the same reason |
 | **Me** | Your own chat window |
-| **Screen** | Centre-screen alert with the raid warning sound |
+| **Screen** | Centre-screen alert and sound |
 
 Tick any mix. Ticking **Group** and **Party** together posts once in a party,
 because a message never goes to the same channel twice. If the game blocks
@@ -110,7 +113,7 @@ The settings are under **Reminders** on the main options page:
 | **Battle Shout** | On | Warriors only; the settings below need it ticked |
 | **Warn when under** | 15 seconds | 0 to 60. At 0 the icon shows only once the shout has run out |
 | **Out of combat** | In instances | Also Always or Never. Hidden while you're resting in a city or inn. In combat it always shows when needed |
-| **Sound** | On | Plays once as the icon appears |
+| **Sound** | Chime | Plays once as the icon appears. Same list as the on-screen alert sound |
 | **Unlock to move** | Off | Shows the icon as "Drag to move" so you can place it; a reload locks it again |
 | **Icon size** | 100% | 50% to 200%. The icon stays centred on the same spot |
 | **Horizontal offset**, **Vertical offset** | 0 and -120 | Distance from the centre of the screen |
@@ -118,7 +121,8 @@ The settings are under **Reminders** on the main options page:
 Offsets count from the centre of the screen, and 200 and -200 sit the same
 distance either side of it. The sliders reach the screen edges at any
 resolution or UI scale, and dragging the icon updates them. **Preview** shows
-the icon for five seconds, as does changing its size or position.
+the icon for five seconds and plays its sound. Changing its size or position
+shows it silently.
 
 | Command | Effect |
 | --- | --- |
@@ -127,7 +131,7 @@ the icon for five seconds, as does changing its size or position.
 | `/scast remind move` | Unlock or lock the icon for dragging |
 | `/scast remind offset <x> <y>` | Place the icon at an exact offset from the screen centre |
 | `/scast remind scale <percent>` | Set the icon size, 50 to 200 |
-| `/scast remind test` | Show the icon for five seconds |
+| `/scast remind test` | Show the icon for five seconds, with its sound |
 
 ## Profiles
 
@@ -145,4 +149,5 @@ next time it logs in or reloads.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). The sounds in `Sounds` were made for Shoutcaster
+and come under the same licence.

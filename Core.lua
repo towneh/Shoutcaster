@@ -7,6 +7,30 @@ ns.profileDefaults = {}
 ns.profileListeners = {}
 ns.issecret = issecretvalue or function() return false end
 
+ns.SOUNDS = {
+    { key = "none", label = "None" },
+    { key = "chime", label = "Chime" },
+    { key = "bell", label = "Bell" },
+    { key = "pluck", label = "Pluck" },
+    { key = "bubble", label = "Bubble" },
+    { key = "marimba", label = "Marimba" },
+}
+local SOUND_FILE = {}
+for _, sound in ipairs(ns.SOUNDS) do
+    if sound.key ~= "none" then
+        SOUND_FILE[sound.key] = "Interface\\AddOns\\" .. addonName .. "\\Sounds\\" .. sound.key .. ".ogg"
+    end
+end
+
+function ns.IsSound(key)
+    return key == "none" or SOUND_FILE[key] ~= nil
+end
+
+function ns.PlayAlertSound(key)
+    local file = SOUND_FILE[key]
+    if file then PlaySoundFile(file, "Master") end
+end
+
 local DEFAULT_PROFILE = "Default"
 local PREFIX = "|cffc79c6eShoutcaster|r"
 

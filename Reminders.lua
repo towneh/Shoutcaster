@@ -8,7 +8,7 @@ ns.profileDefaults.reminders = {
     battleShout = true,
     warnAt = 15,
     outOfCombat = "instances",
-    sound = true,
+    sound = "chime",
     pos = { x = 0, y = -120 },
     scale = 100,
 }
@@ -117,6 +117,19 @@ local function buildFrame()
     applyPosition()
 end
 
+local function playSound()
+    ns.PlayAlertSound(db.sound)
+end
+
+-- v0.1.0 saved the sound as on or off.
+local function migrate()
+    if db.sound == false then
+        db.sound = "none"
+    elseif not ns.IsSound(db.sound) then
+        db.sound = ns.profileDefaults.reminders.sound
+    end
+end
+
 -- Only the highest rank may count as known, so check them all.
 local function knowsShout()
     for _, id in ipairs(RANKS) do
@@ -173,9 +186,7 @@ local function refresh()
     if show then
         render(state)
         frame:EnableMouse(false)
-        if not shown and db.sound and GetTime() >= settleUntil then
-            PlaySound(SOUNDKIT.RAID_WARNING, "Master")
-        end
+        if not shown and GetTime() >= settleUntil then playSound() end
     elseif frame then
         frame.pulse:Stop()
         frame:Hide()
@@ -257,6 +268,8 @@ ns.reminders = {
         db[key] = value
         if key == "battleShout" then
             setEnabled(value and isWarrior)
+        elseif key == "sound" then
+            playSound()
         else
             schedule()
         end
@@ -267,7 +280,8 @@ ns.reminders = {
         if not on and frame then frame:EnableMouse(false) end
         refresh()
     end,
-    Preview = function()
+    Preview = function(withSound)
+        if withSound then playSound() end
         previewing = true
         previewToken = previewToken + 1
         local token, saved = previewToken, expiry
@@ -296,12 +310,14 @@ ns.reminders = {
 
 table.insert(ns.profileListeners, function(profile)
     db = profile.reminders
+    migrate()
     applyPosition()
     setEnabled(db.battleShout and isWarrior)
 end)
 
 table.insert(ns.modules, function(_, profile)
     db = profile.reminders
+    migrate()
     isWarrior = select(2, UnitClass("player")) == "WARRIOR"
     if isWarrior and db.battleShout then setEnabled(true) end
 end)
@@ -324,7 +340,7 @@ ns.commands.remind = {
             ns.reminders.SetUnlocked(not unlocked)
             ns.RefreshOptions()
         elseif word == "test" then
-            ns.reminders.Preview()
+            ns.reminders.Preview(true)
         end
         ns.Print(format("Battle Shout reminder %s, warn under %ds, out of combat: %s, offset %d, %d, size %d%%%s",
             db.battleShout and "on" or "off", db.warnAt, db.outOfCombat, db.pos.x, db.pos.y, db.scale,

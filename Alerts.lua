@@ -29,7 +29,7 @@ local COLUMNS = {
     { key = "me", label = "Me", name = "My chat window",
       tooltip = "Your own chat window. Only you see it." },
     { key = "screen", label = "Screen", name = "On-screen alert",
-      tooltip = "Centre-screen alert with the raid warning sound." },
+      tooltip = "Centre-screen alert and sound." },
 }
 
 local ROWS = {
@@ -72,7 +72,7 @@ local DEFAULTS = {
     },
 }
 
-ns.profileDefaults.alerts = { enabled = true, locations = {} }
+ns.profileDefaults.alerts = { enabled = true, sound = "chime", locations = {} }
 for _, location in ipairs(LOCATIONS) do
     local rows = {}
     for _, row in ipairs(ROWS) do
@@ -190,9 +190,7 @@ local function showOnScreen(text, withSound)
     else
         UIErrorsFrame:AddMessage(text, 1, 0.3, 0.3)
     end
-    if withSound then
-        PlaySound(SOUNDKIT and SOUNDKIT.RAID_WARNING or 8959, "Master")
-    end
+    if withSound then ns.PlayAlertSound(db.sound) end
 end
 
 local function chatLocked()
@@ -420,6 +418,11 @@ ns.alerts = {
     ApplyRowMask = applyRowMask,
     IsEnabled = function() return db.enabled end,
     SetEnabled = function(on) setEnabled(on) end,
+    GetSound = function() return db.sound end,
+    SetSound = function(key)
+        db.sound = key
+        ns.PlayAlertSound(key)
+    end,
     Cells = function(location, row) return db.locations[location][row] end,
     Test = function() showOnScreen("TAUNT RESIST! (Test Dummy)", true) end,
     Copy = copyLocation,
@@ -427,13 +430,19 @@ ns.alerts = {
     LocationLabel = function(key) return lookup(LOCATIONS, key).label end,
 }
 
+local function checkSound()
+    if not ns.IsSound(db.sound) then db.sound = ns.profileDefaults.alerts.sound end
+end
+
 table.insert(ns.profileListeners, function(profile)
     db = profile.alerts
+    checkSound()
     setEnabled(db.enabled)
 end)
 
 table.insert(ns.modules, function(_, profile)
     db = profile.alerts
+    checkSound()
     for id in pairs(SPELLS) do
         local name = readable(C_Spell.GetSpellName, id)
         if name then byName[name] = SPELLS[id] end

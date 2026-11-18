@@ -282,8 +282,11 @@ local function buildReminders(category, layout)
     end, "When to show it outside combat. It never shows while you're resting in a city or inn.")
         :SetParentInitializer(shoutInit, shoutOn)
 
-    Settings.CreateCheckbox(category, bind("sound", Settings.VarType.Boolean, "Sound"),
-        "Play the raid warning sound when the icon appears.")
+    Settings.CreateDropdown(category, bind("sound", Settings.VarType.String, "Sound"), function()
+        local container = Settings.CreateControlTextContainer()
+        for _, sound in ipairs(ns.SOUNDS) do container:Add(sound.key, sound.label) end
+        return container:GetData()
+    end, "Played when the icon appears.")
         :SetParentInitializer(shoutInit, shoutOn)
 
     local unlock = proxy(category, "REMIND_UNLOCKED", Settings.VarType.Boolean, "Unlock to move", false,
@@ -317,8 +320,8 @@ local function buildReminders(category, layout)
     updateOffsetRanges()
     SettingsPanel:HookScript("OnShow", updateOffsetRanges)
 
-    local preview = CreateSettingsButtonInitializer("Preview", "Show", reminders.Preview,
-        "Show the icon for five seconds.", true)
+    local preview = CreateSettingsButtonInitializer("Preview", "Show", function() reminders.Preview(true) end,
+        "Show the icon for five seconds, with its sound.", true)
     preview:SetParentInitializer(shoutInit, shoutOn)
     layout:AddInitializer(preview)
 end
@@ -334,6 +337,14 @@ table.insert(ns.modules, function()
         ns.alerts.IsEnabled, ns.alerts.SetEnabled)
     local enabledInit = Settings.CreateCheckbox(category, enabled, "Turn all tank and interrupt announcements on or off.")
     local function alertsOn() return enabled:GetValue() end
+    local sound = proxy(category, "ALERTS_SOUND", Settings.VarType.String, "On-screen alert sound",
+        ns.profileDefaults.alerts.sound, ns.alerts.GetSound, ns.alerts.SetSound)
+    Settings.CreateDropdown(category, sound, function()
+        local container = Settings.CreateControlTextContainer()
+        for _, option in ipairs(ns.SOUNDS) do container:Add(option.key, option.label) end
+        return container:GetData()
+    end, "Played with announcements ticked under Screen.")
+        :SetParentInitializer(enabledInit, alertsOn)
     layout:AddInitializer(CreateSettingsButtonInitializer("Test alert", "Show",
         ns.alerts.Test, "Show a sample alert on your screen. Nothing is sent to chat.", true))
 
