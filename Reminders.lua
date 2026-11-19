@@ -34,7 +34,7 @@ local db
 local events = CreateFrame("Frame")
 local frame
 local expiry, duration = 0, DEFAULT_DURATION
-local inCombat = false
+local inCombat, inEncounter = false, false
 local settleUntil = 0
 local generation = 0
 local shown, unlocked, previewing = false, false, false
@@ -208,7 +208,7 @@ local function schedule()
 end
 
 local function resync()
-    if inCombat or GetTime() < settleUntil then return end
+    if inCombat or inEncounter or GetTime() < settleUntil then return end
     readAura()
     schedule()
 end
@@ -225,7 +225,14 @@ events:SetScript("OnEvent", function(_, event, _, _, spellID)
     elseif event == "PLAYER_REGEN_ENABLED" then
         inCombat = false
         resync()
+    elseif event == "ENCOUNTER_START" then
+        -- Boss pulls hide the aura a moment before combat begins.
+        inEncounter = true
+    elseif event == "ENCOUNTER_END" then
+        inEncounter = false
+        resync()
     elseif event == "PLAYER_ENTERING_WORLD" then
+        inEncounter = false
         settleUntil = GetTime() + LOADING_SETTLE
         C_Timer.After(LOADING_SETTLE + 0.05, resync)
         refresh()
@@ -241,7 +248,8 @@ local function setEnabled(on)
         events:RegisterUnitEvent("UNIT_AURA", "player")
         events:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
         for _, e in ipairs({ "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "PLAYER_ENTERING_WORLD",
-            "ZONE_CHANGED_NEW_AREA", "PLAYER_UPDATE_RESTING", "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST" }) do
+            "ENCOUNTER_START", "ENCOUNTER_END", "ZONE_CHANGED_NEW_AREA", "PLAYER_UPDATE_RESTING",
+            "PLAYER_DEAD", "PLAYER_ALIVE", "PLAYER_UNGHOST" }) do
             events:RegisterEvent(e)
         end
         inCombat = InCombatLockdown()
@@ -249,6 +257,7 @@ local function setEnabled(on)
         refresh()
     else
         events:UnregisterAllEvents()
+        inEncounter = false
         generation = generation + 1
         if frame then
             frame.pulse:Stop()
